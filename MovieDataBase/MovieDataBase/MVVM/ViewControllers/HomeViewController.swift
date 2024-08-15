@@ -145,7 +145,7 @@ extension HomeViewController: UITableViewDelegate {
             return nil
         }
         
-        guard let categoryView = Bundle.main.loadNibNamed(AppIdentifiers.NibName.categoryView, 
+        guard let categoryView = Bundle.main.loadNibNamed(AppIdentifiers.NibName.categoryView,
                                                           owner: self, options: nil)?.first as? CategoryView else {
             return nil
         }
@@ -153,18 +153,29 @@ extension HomeViewController: UITableViewDelegate {
         let item = viewModel.items[section]
         categoryView.configureCell(title: item.sectionTitle, isCollapsed: item.isCollapsed)
         
-        /// Customize background color based on section type
+        /// Customize background color based on section type with dynamic colors
         switch item.type {
         case .year:
-            categoryView.backgroundColor = UIColor.systemGray6
+            categoryView.bgView.backgroundColor = UIColor { traitCollection in
+                return traitCollection.userInterfaceStyle == .dark ? UIColor.systemCyan.withAlphaComponent(0.6) : UIColor.systemOrange.withAlphaComponent(0.2)
+            }
+          
         case .genre:
-            categoryView.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.1)
+            categoryView.bgView.backgroundColor = UIColor { traitCollection in
+                return traitCollection.userInterfaceStyle == .dark ? UIColor.systemIndigo.withAlphaComponent(0.6) : UIColor.systemBlue.withAlphaComponent(0.1)
+            }
         case .director:
-            categoryView.backgroundColor = UIColor.systemGreen.withAlphaComponent(0.1)
+            categoryView.bgView.backgroundColor = UIColor { traitCollection in
+                return traitCollection.userInterfaceStyle == .dark ? UIColor.systemGreen.withAlphaComponent(0.6) : UIColor.systemGreen.withAlphaComponent(0.1)
+            }
         case .actor:
-            categoryView.backgroundColor = UIColor.systemOrange.withAlphaComponent(0.1)
+            categoryView.bgView.backgroundColor = UIColor { traitCollection in
+                return traitCollection.userInterfaceStyle == .dark ? UIColor.systemGray5 : UIColor.systemGray6
+            }
         case .allMovies:
-            categoryView.backgroundColor = UIColor.systemPurple.withAlphaComponent(0.1)
+            categoryView.bgView.backgroundColor = UIColor { traitCollection in
+                return traitCollection.userInterfaceStyle == .dark ? UIColor.systemFill.withAlphaComponent(0.6) : UIColor.systemPurple.withAlphaComponent(0.1)
+            }
         }
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapHeader(_:)))
@@ -172,6 +183,9 @@ extension HomeViewController: UITableViewDelegate {
         categoryView.tag = section
         return categoryView
     }
+
+
+
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return viewModel.isSearching ? 0 : 44.0

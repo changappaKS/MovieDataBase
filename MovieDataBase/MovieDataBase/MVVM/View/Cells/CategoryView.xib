@@ -14,34 +14,47 @@
             <rect key="frame" x="0.0" y="0.0" width="405" height="53"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bMr-dg-fVm">
-                    <rect key="frame" x="16" y="14.666666666666664" width="42" height="24"/>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZkD-YX-2Hu">
+                    <rect key="frame" x="0.0" y="0.0" width="405" height="53"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bMr-dg-fVm">
+                            <rect key="frame" x="20" y="14.666666666666664" width="42" height="24"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="24" id="OSG-p2-sKP"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="greaterthan" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="OlR-3L-Orc">
+                            <rect key="frame" x="361" y="18.333333333333329" width="24" height="17"/>
+                            <color key="tintColor" systemColor="systemGrayColor"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="24" id="Bb0-xv-h5T"/>
+                                <constraint firstAttribute="height" constant="24" id="HWi-Ie-fkA"/>
+                            </constraints>
+                        </imageView>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="24" id="OSG-p2-sKP"/>
+                        <constraint firstItem="bMr-dg-fVm" firstAttribute="centerY" secondItem="ZkD-YX-2Hu" secondAttribute="centerY" id="Eg5-0t-4JE"/>
+                        <constraint firstItem="bMr-dg-fVm" firstAttribute="leading" secondItem="ZkD-YX-2Hu" secondAttribute="leading" constant="20" id="GDE-2Z-2HC"/>
+                        <constraint firstItem="OlR-3L-Orc" firstAttribute="centerY" secondItem="bMr-dg-fVm" secondAttribute="centerY" id="Jwp-YX-4Sc"/>
+                        <constraint firstAttribute="trailing" secondItem="OlR-3L-Orc" secondAttribute="trailing" constant="20" id="Lth-8k-Nfi"/>
                     </constraints>
-                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                    <nil key="textColor"/>
-                    <nil key="highlightedColor"/>
-                </label>
-                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="greaterthan" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="OlR-3L-Orc">
-                    <rect key="frame" x="365" y="18.333333333333329" width="24" height="17"/>
-                    <color key="tintColor" systemColor="systemGrayColor"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="24" id="Bb0-xv-h5T"/>
-                        <constraint firstAttribute="height" constant="24" id="HWi-Ie-fkA"/>
-                    </constraints>
-                </imageView>
+                </view>
             </subviews>
-            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <color key="backgroundColor" red="0.96470588450000005" green="0.93333333730000001" blue="0.98431372640000003" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
             <constraints>
-                <constraint firstItem="OlR-3L-Orc" firstAttribute="centerY" secondItem="bMr-dg-fVm" secondAttribute="centerY" id="AJ0-aj-IRw"/>
-                <constraint firstItem="bMr-dg-fVm" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="RpE-g5-R8v"/>
-                <constraint firstItem="bMr-dg-fVm" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="16" id="U8r-cf-G3f"/>
-                <constraint firstAttribute="trailing" secondItem="OlR-3L-Orc" secondAttribute="trailing" constant="16" id="gK7-Qr-vl7"/>
+                <constraint firstAttribute="trailing" secondItem="ZkD-YX-2Hu" secondAttribute="trailing" id="6lD-dB-gBI"/>
+                <constraint firstItem="ZkD-YX-2Hu" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="HXC-Ga-pWF"/>
+                <constraint firstAttribute="bottom" secondItem="ZkD-YX-2Hu" secondAttribute="bottom" id="J48-Lw-r6j"/>
+                <constraint firstItem="ZkD-YX-2Hu" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="gJt-yV-DUo"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="arrowImage" destination="OlR-3L-Orc" id="ddl-6F-R2A"/>
+                <outlet property="bgView" destination="ZkD-YX-2Hu" id="BJN-nj-r8K"/>
                 <outlet property="titleLabel" destination="bMr-dg-fVm" id="SCY-Qy-Csy"/>
             </connections>
             <point key="canvasLocation" x="-75.572519083969468" y="289.78873239436621"/>

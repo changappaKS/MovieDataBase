@@ -10,6 +10,7 @@ import UIKit
 
 class CategoryView: UIView {
 
+    @IBOutlet weak var bgView: UIView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var arrowImage: UIImageView!
     
