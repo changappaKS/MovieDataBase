@@ -30,7 +30,7 @@ class ImageLoader {
         
         /// Asynchronous image loading
         URLSession.shared.dataTask(with: url) { data, response, error in
-            if let error = error {
+            if error != nil {
                 DispatchQueue.main.async {
                     imageView.image = UIImage(named: placeholder)
                 }

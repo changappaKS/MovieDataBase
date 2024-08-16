@@ -92,7 +92,6 @@
 				B600B1632C6DEC0F00D4D8D0 /* Application */,
 				B600B1652C6DEC3B00D4D8D0 /* StoryBoards */,
 				B600B14E2C6DE77700D4D8D0 /* Assets.xcassets */,
-				B600B1502C6DE77700D4D8D0 /* LaunchScreen.storyboard */,
 				B600B1532C6DE77700D4D8D0 /* Info.plist */,
 			);
 			path = MovieDataBase;
@@ -175,6 +174,7 @@
 		B600B1652C6DEC3B00D4D8D0 /* StoryBoards */ = {
 			isa = PBXGroup;
 			children = (
+				B600B1502C6DE77700D4D8D0 /* LaunchScreen.storyboard */,
 				B600B14B2C6DE77500D4D8D0 /* Main.storyboard */,
 			);
 			path = StoryBoards;
