@@ -63,7 +63,7 @@ extension HomeViewController: UITableViewDataSource {
             return viewModel.filteredMovies.count
         } else {
             let item = viewModel.items[section]
-            return item.isCollapsed ? 0 : item.rowCount
+            return viewModel.isCollapsed(section: item.type) ? 0 : item.rowCount
         }
     }
     
@@ -79,60 +79,42 @@ extension HomeViewController: UITableViewDataSource {
         } else {
             let item = viewModel.items[indexPath.section]
             
-            switch item.type {
-            case .year, .genre, .director, .actor:
+            switch item {
+            case .year(let items),
+                    .genre(let items),
+                    .director(let items),
+                    .actor(let items):
                 guard let cell = tableView.dequeueReusableCell(withIdentifier: AppIdentifiers.CellIdentifiers.movieSectionTVCell, for: indexPath) as? MovieSectionTVCell else {
                     return UITableViewCell()
                 }
-                switch item.type {
-                case .year:
-                    if let yearItem = item as? MovieViewModelYearItem {
-                        cell.sectionTitle.text = yearItem.years[indexPath.row]
-                    }
-                case .genre:
-                    if let genreItem = item as? MovieViewModelGenreItem {
-                        cell.sectionTitle.text = genreItem.genres[indexPath.row]
-                    }
-                case .director:
-                    if let directorItem = item as? MovieViewModelDirectorItem {
-                        cell.sectionTitle.text = directorItem.directors[indexPath.row]
-                    }
-                case .actor:
-                    if let actorItem = item as? MovieViewModelActorItem {
-                        cell.sectionTitle.text = actorItem.actors[indexPath.row]
-                    }
-                default:
-                    break
-                }
-                
-                /// Different background color or font based on section type
-                switch item.type {
-                case .year:
-                    cell.backgroundColor = UIColor.systemGray6
-                case .genre:
-                    cell.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.05)
-                case .director:
-                    cell.backgroundColor = UIColor.systemGreen.withAlphaComponent(0.05)
-                case .actor:
-                    cell.backgroundColor = UIColor.systemOrange.withAlphaComponent(0.05)
-                default:
-                    break
-                }
+                cell.sectionTitle.text = items[indexPath.row]
+                configureCellAppearance(cell: cell, for: item.type)
                 cell.selectionStyle = .none
-                
                 return cell
-            case .allMovies:
+            case .allMovies(let movies):
                 guard let cell = tableView.dequeueReusableCell(withIdentifier: AppIdentifiers.CellIdentifiers.moviesTVCell, for: indexPath) as? MoviesTVCell else {
                     return UITableViewCell()
                 }
-                if let allMoviesItem = item as? MovieViewModelAllMoviesItem {
-                    let movie = allMoviesItem.movies[indexPath.row]
-                    cell.configure(with: movie)
-                }
+                let movie = movies[indexPath.row]
+                cell.configure(with: movie)
                 cell.selectionStyle = .none
-                cell.layoutIfNeeded()
                 return cell
             }
+        }
+    }
+    
+    private func configureCellAppearance(cell: UITableViewCell, for type: MovieViewModelItemType) {
+        switch type {
+        case .year:
+            cell.backgroundColor = UIColor.systemGray6
+        case .genre:
+            cell.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.05)
+        case .director:
+            cell.backgroundColor = UIColor.systemGreen.withAlphaComponent(0.05)
+        case .actor:
+            cell.backgroundColor = UIColor.systemOrange.withAlphaComponent(0.05)
+        case .allMovies:
+            cell.backgroundColor = UIColor.clear
         }
     }
 }
@@ -151,8 +133,8 @@ extension HomeViewController: UITableViewDelegate {
         }
         
         let item = viewModel.items[section]
-        categoryView.configureCell(title: item.sectionTitle, isCollapsed: item.isCollapsed)
-        
+        categoryView.configureCell(title: item.sectionTitle, isCollapsed: viewModel.isCollapsed(section: item.type))
+
         /// Customize background color based on section type with dynamic colors
         switch item.type {
         case .year:
@@ -204,46 +186,33 @@ extension HomeViewController: UITableViewDelegate {
         let selectedMovie: Movie?
         
         if viewModel.isSearching {
-            /// If searching, get the movie directly from the filteredMovies array
             selectedMovie = viewModel.filteredMovies[indexPath.row]
         } else {
-            /// If not searching, determine the section type and filter accordingly
             let item = viewModel.items[indexPath.section]
-            
-            switch item.type {
-            case .year:
-                if let yearItem = item as? MovieViewModelYearItem {
-                    let selectedYear = yearItem.years[indexPath.row]
-                    let filteredMovies = viewModel.fetchMoviesByYear(year: selectedYear)
-                    navigateToMovieList(with: filteredMovies, title: "\(AppStrings.ByTitles.moviesFrom) \(selectedYear)")
+            switch item {
+            case .year(let years):
+                let selectedYear = years[indexPath.row]
+                let filteredMovies = viewModel.fetchMoviesByYear(year: selectedYear)
+                navigateToMovieList(with: filteredMovies, title: "\(AppStrings.ByTitles.moviesFrom) \(selectedYear)")
+            case .genre(let genres):
+                let selectedGenre = genres[indexPath.row]
+                let filteredMovies = viewModel.fetchMoviesByGenre(genre: selectedGenre)
+                navigateToMovieList(with: filteredMovies, title: "\(AppStrings.ByTitles.moviesIn) \(selectedGenre)")
+            case .director(let directors):
+                let selectedDirector = directors[indexPath.row]
+                let filteredMovies = viewModel.fetchMoviesByDirector(director: selectedDirector)
+                navigateToMovieList(with: filteredMovies, title: "\(AppStrings.ByTitles.moviesBy) \(selectedDirector)")
+            case .actor(let actors):
+                let selectedActor = actors[indexPath.row]
+                let filteredMovies = viewModel.fetchMoviesByActor(actor: selectedActor)
+                navigateToMovieList(with: filteredMovies, title: "\(AppStrings.ByTitles.moviesWith) \(selectedActor)")
+            case .allMovies(let movies):
+                selectedMovie = movies[indexPath.row]
+                guard let detailsVC = storyboard?.instantiateViewController(withIdentifier: AppIdentifiers.ViewControllerIdentifiers.movieDetailsVC) as? MovieDetailsViewController else {
+                    return
                 }
-            case .genre:
-                if let genreItem = item as? MovieViewModelGenreItem {
-                    let selectedGenre = genreItem.genres[indexPath.row]
-                    let filteredMovies = viewModel.fetchMoviesByGenre(genre: selectedGenre)
-                    navigateToMovieList(with: filteredMovies, title: "\(AppStrings.ByTitles.moviesIn) \(selectedGenre)")
-                }
-            case .director:
-                if let directorItem = item as? MovieViewModelDirectorItem {
-                    let selectedDirector = directorItem.directors[indexPath.row]
-                    let filteredMovies = viewModel.fetchMoviesByDirector(director: selectedDirector)
-                    navigateToMovieList(with: filteredMovies, title: "\(AppStrings.ByTitles.moviesBy) \(selectedDirector)")
-                }
-            case .actor:
-                if let actorItem = item as? MovieViewModelActorItem {
-                    let selectedActor = actorItem.actors[indexPath.row]
-                    let filteredMovies = viewModel.fetchMoviesByActor(actor: selectedActor)
-                    navigateToMovieList(with: filteredMovies, title: "\(AppStrings.ByTitles.moviesWith) \(selectedActor)")
-                }
-            case .allMovies:
-                if let allMoviesItem = item as? MovieViewModelAllMoviesItem {
-                    selectedMovie = allMoviesItem.movies[indexPath.row]
-                    guard let detailsVC = storyboard?.instantiateViewController(withIdentifier: AppIdentifiers.ViewControllerIdentifiers.movieDetailsVC) as? MovieDetailsViewController else {
-                        return
-                    }
-                    detailsVC.movie = selectedMovie
-                    navigationController?.pushViewController(detailsVC, animated: true)
-                }
+                detailsVC.movie = selectedMovie
+                navigationController?.pushViewController(detailsVC, animated: true)
             }
         }
     }
@@ -253,12 +222,10 @@ extension HomeViewController {
 
     @objc func didTapHeader(_ sender: UITapGestureRecognizer) {
         guard let section = sender.view?.tag else { return }
-        viewModel.items[section].isCollapsed.toggle()
+        let item = viewModel.items[section]
+        viewModel.toggleCollapseState(for: item.type)
         
-        /// Reload the section to update the UI
         homeTableView.reloadSections(IndexSet(integer: section), with: .automatic)
-        
-        /// Ensure layout is updated
         homeTableView.layoutIfNeeded()
         homeTableView.layoutSubviews()
     }

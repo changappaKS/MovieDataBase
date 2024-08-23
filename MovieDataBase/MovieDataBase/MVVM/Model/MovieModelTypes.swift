@@ -16,80 +16,61 @@ enum MovieViewModelItemType {
     case allMovies
 }
 
-/// Define common properites required for each cell
-protocol MovieViewModelItem {
-    var type: MovieViewModelItemType { get }
-    var sectionTitle: String { get }
-    var rowCount: Int { get }
-    var isCollapsed: Bool { get set }
-}
+/// Define the MovieViewModelSection struct to handle different section types
+import Foundation
 
-/// Model for the "Year" section
-class MovieViewModelYearItem: MovieViewModelItem {
-    var type: MovieViewModelItemType { return .year }
-    var sectionTitle: String { return AppStrings.SectionTitles.year }
-    var isCollapsed: Bool = true         /// Section is initially collapsed
+enum MovieViewModelSection {
+    case year(items: [String])
+    case genre(items: [String])
+    case director(items: [String])
+    case actor(items: [String])
+    case allMovies(items: [Movie])
     
-    var years: [String]
-    var rowCount: Int { return years.count }
-
-    init(years: [String]) {
-        self.years = years           
+    /// Type of section
+    var type: MovieViewModelItemType {
+        switch self {
+        case .year: return .year
+        case .genre: return .genre
+        case .director: return .director
+        case .actor: return .actor
+        case .allMovies: return .allMovies
+        }
     }
-}
-
-/// Model for the "Genre" section
-class MovieViewModelGenreItem: MovieViewModelItem {
-    var type: MovieViewModelItemType { return .genre }
-    var sectionTitle: String { return AppStrings.SectionTitles.genre }
-    var isCollapsed: Bool = true
     
-    var genres: [String]
-    var rowCount: Int { return genres.count }
-
-    init(genres: [String]) {
-        self.genres = genres           
+    /// section title for each header
+    var sectionTitle: String {
+        switch self {
+        case .year: return AppStrings.SectionTitles.year
+        case .genre: return AppStrings.SectionTitles.genre
+        case .director: return AppStrings.SectionTitles.directors
+        case .actor: return AppStrings.SectionTitles.actors
+        case .allMovies: return AppStrings.SectionTitles.allMovies
+        }
     }
-}
-
-/// Model for the "Directors" section
-class MovieViewModelDirectorItem: MovieViewModelItem {
-    var type: MovieViewModelItemType { return .director }
-    var sectionTitle: String { return AppStrings.SectionTitles.directors }
-    var isCollapsed: Bool = true
     
-    var directors: [String]
-    var rowCount: Int { return directors.count }
-
-    init(directors: [String]) {
-        self.directors = directors
+    /// Number of items present in each section
+    var rowCount: Int {
+        switch self {
+        case .year(let items),
+             .genre(let items),
+             .director(let items),
+             .actor(let items):
+            return items.count
+        case .allMovies(let items):
+            return items.count
+        }
     }
-}
-
-/// Model for the "Actors" section
-class MovieViewModelActorItem: MovieViewModelItem {
-    var type: MovieViewModelItemType { return .actor }
-    var sectionTitle: String { return AppStrings.SectionTitles.actors }
-    var isCollapsed: Bool = true
     
-    var actors: [String]
-    var rowCount: Int { return actors.count }
-
-    init(actors: [String]) {
-        self.actors = actors
-    }
-}
-
-/// Model for the "All Movies" section
-class MovieViewModelAllMoviesItem: MovieViewModelItem {
-    var type: MovieViewModelItemType { return .allMovies }
-    var sectionTitle: String { return AppStrings.SectionTitles.allMovies }
-    var isCollapsed: Bool = true
-    
-    var movies: [Movie]
-    var rowCount: Int { return movies.count }
-
-    init(movies: [Movie]) {
-        self.movies = movies   
+    /// Item at each section
+    func item(at index: Int) -> Any {
+        switch self {
+        case .year(let items),
+             .genre(let items),
+             .director(let items),
+             .actor(let items):
+            return items[index]
+        case .allMovies(let items):
+            return items[index]
+        }
     }
 }

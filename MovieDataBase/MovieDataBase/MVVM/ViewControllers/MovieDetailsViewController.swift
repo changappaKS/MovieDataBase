@@ -31,6 +31,7 @@ class MovieDetailsViewController: UIViewController {
         navigationController?.navigationBar.tintColor = UIColor.gray
     }
     
+    /// update the UI details
     func setupView() {
         guard let movie = movie else { return }
         self.title = AppStrings.TitleStrings.movieDetails
@@ -46,6 +47,7 @@ class MovieDetailsViewController: UIViewController {
         ImageLoader.shared.loadImage(from: movie.poster, into: moviePosterImageView)
     }
 
+    /// make sure that textview is not scrollable and height is adjusted correctly
     private func updateTextViewHeight() {
         plotTextView.isScrollEnabled = false
         plotTextView.sizeToFit()

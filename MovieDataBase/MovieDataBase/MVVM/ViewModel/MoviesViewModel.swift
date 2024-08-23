@@ -10,12 +10,14 @@ import Foundation
 
 class MovieViewModel {
 
-    var items: [MovieViewModelItem] = []
+    var items: [MovieViewModelSection] = []
     var filteredMovies: [Movie] = []
     var isSearching: Bool = false
+    var collapsedState: [MovieViewModelItemType: Bool] = [:]
 
     init() {
         loadMoviesFromJSON()
+        setupInitialCollapseState()
     }
     
     /// Method to load movies from the JSON file
@@ -61,90 +63,87 @@ class MovieViewModel {
             }
         }
         
-        /// Create section models
-        let yearItem = MovieViewModelYearItem(years: Array(years).sorted())
-        let genreItem = MovieViewModelGenreItem(genres: Array(genres).sorted())
-        let directorItem = MovieViewModelDirectorItem(directors: Array(directors).sorted())
-        let actorItem = MovieViewModelActorItem(actors: Array(actors).sorted())
-        let allMoviesItem = MovieViewModelAllMoviesItem(movies: movies)
+        /// Create section models using MovieViewModelSection
+        let yearItem = MovieViewModelSection.year(items: Array(years).sorted())
+        let genreItem = MovieViewModelSection.genre(items: Array(genres).sorted())
+        let directorItem = MovieViewModelSection.director(items: Array(directors).sorted())
+        let actorItem = MovieViewModelSection.actor(items: Array(actors).sorted())
+        let allMoviesItem = MovieViewModelSection.allMovies(items: movies)
         
         items = [yearItem, genreItem, directorItem, actorItem, allMoviesItem]
     }
     
+    private func setupInitialCollapseState() {
+            items.forEach { section in
+                collapsedState[section.type] = true
+            }
+        }
+
+        func toggleCollapseState(for section: MovieViewModelItemType) {
+            if let currentState = collapsedState[section] {
+                collapsedState[section] = !currentState
+            }
+        }
+
+        func isCollapsed(section: MovieViewModelItemType) -> Bool {
+            return collapsedState[section] ?? true
+        }
+    
     /// Function to fetch all movies for a given year
     func fetchMoviesByYear(year: String) -> [Movie] {
-        let filteredMovies = items.compactMap { item -> [Movie]? in
-            if let allMoviesItem = item as? MovieViewModelAllMoviesItem {
-                return allMoviesItem.movies.filter { movie in
-                    // Extract the starting year from the movie's year
-                    if let movieYear = movie.year?.split(separator: "–").first?.trimmingCharacters(in: .whitespaces) {
-                        return movieYear == year
-                    }
-                    return false
-                }
+        return fetchMovies(filter: { movie in
+            if let movieYear = movie.year?.split(separator: "–").first?.trimmingCharacters(in: .whitespaces) {
+                return movieYear == year
             }
-            return nil
-        }
-        return filteredMovies.flatMap { $0 }
+            return false
+        })
     }
 
     /// Function to fetch all movies for a given genre
     func fetchMoviesByGenre(genre: String) -> [Movie] {
-        let filteredMovies = items.compactMap { item -> [Movie]? in
-            if let allMoviesItem = item as? MovieViewModelAllMoviesItem {
-                return allMoviesItem.movies.filter { $0.genre?.contains(genre) == true }
-            }
-            return nil
-        }
-        return filteredMovies.flatMap { $0 }
+        return fetchMovies(filter: { $0.genre?.contains(genre) == true })
     }
 
     /// Function to fetch all movies for a given actor
     func fetchMoviesByActor(actor: String) -> [Movie] {
-        let filteredMovies = items.compactMap { item -> [Movie]? in
-            if let allMoviesItem = item as? MovieViewModelAllMoviesItem {
-                return allMoviesItem.movies.filter { $0.actors?.contains(actor) == true }
-            }
-            return nil
-        }
-        return filteredMovies.flatMap { $0 }
+        return fetchMovies(filter: { $0.actors?.contains(actor) == true })
+    }
+    
+    func fetchMoviesByDirector(director: String) -> [Movie] {
+        return fetchMovies(filter: { $0.director?.contains(director) == true })
     }
 
     /// Function to fetch all movies for a given director
-    func fetchMoviesByDirector(director: String) -> [Movie] {
-        let filteredMovies = items.compactMap { item -> [Movie]? in
-            if let allMoviesItem = item as? MovieViewModelAllMoviesItem {
-                return allMoviesItem.movies.filter { $0.director?.contains(director) == true }
-            }
-            return nil
+    private func fetchMovies(filter: @escaping (Movie) -> Bool) -> [Movie] {
+        guard let allMoviesItem = items.first(where: { $0.type == .allMovies }) else {
+            return []
         }
-        return filteredMovies.flatMap { $0 }
+        
+        if case let MovieViewModelSection.allMovies(movies) = allMoviesItem {
+            return movies.filter(filter)
+        }
+        
+        return []
     }
 
-    /// Method to search movie with given parameter
+
     func searchMovies(with query: String) {
-        isSearching = !query.isEmpty
-        
-        if isSearching {
-            filteredMovies = items.flatMap { item -> [Movie] in
-                if let allMoviesItem = item as? MovieViewModelAllMoviesItem {
-                    return allMoviesItem.movies.filter {
-                        $0.title?.localizedCaseInsensitiveContains(query) == true ||
-                        $0.genre?.localizedCaseInsensitiveContains(query) == true ||
-                        $0.actors?.localizedCaseInsensitiveContains(query) == true ||
-                        $0.director?.localizedCaseInsensitiveContains(query) == true
-                    }
-                }
-                return []
+            isSearching = !query.isEmpty
+            
+            if isSearching {
+                filteredMovies = fetchMovies(filter: {
+                    $0.title?.localizedCaseInsensitiveContains(query) == true ||
+                    $0.genre?.localizedCaseInsensitiveContains(query) == true ||
+                    $0.actors?.localizedCaseInsensitiveContains(query) == true ||
+                    $0.director?.localizedCaseInsensitiveContains(query) == true
+                })
+            } else {
+                filteredMovies = []
             }
-        } else {
+        }
+
+        func cancelSearch() {
+            isSearching = false
             filteredMovies = []
         }
-    }
-
-    /// Cancel Search Actions
-    func cancelSearch() {
-        isSearching = false
-        filteredMovies = []
-    }
 }
