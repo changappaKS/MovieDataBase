@@ -12,7 +12,13 @@ import UIKit
 class ImageLoader {
     static let shared = ImageLoader() /// Singleton instance
     
-    private init() { }
+    private let session: URLSession
+    
+    /// Initializer that accepts a URLSession instance
+    /// - Parameter session: The URLSession instance to use. Defaults to `URLSession.shared`.
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
     
     /// Loads an image from a URL into a UIImageView, with a placeholder image if the download fails or the URL is invalid.
     /// - Parameters:
@@ -22,14 +28,14 @@ class ImageLoader {
     func loadImage(from urlString: String?, into imageView: UIImageView, placeholder: String = "folderThumbnail") {
         guard let urlString = urlString, let url = URL(string: urlString) else {
             /// If the URL is invalid, set the placeholder image
-            imageView.image = UIImage(named: placeholder )
+            imageView.image = UIImage(named: placeholder)
             return
         }
         
         imageView.image = UIImage(named: placeholder)
         
         /// Asynchronous image loading
-        URLSession.shared.dataTask(with: url) { data, response, error in
+        session.dataTask(with: url) { data, response, error in
             if error != nil {
                 DispatchQueue.main.async {
                     imageView.image = UIImage(named: placeholder)

@@ -17,7 +17,6 @@ enum MovieViewModelItemType {
 }
 
 /// Define the MovieViewModelSection struct to handle different section types
-import Foundation
 
 enum MovieViewModelSection {
     case year(items: [String])
