@@ -10,13 +10,13 @@ import UIKit
 
 class RatingControlView: UIControl {
 
-    private var ratings: [Rating] = []
+    var ratings: [Rating] = []
     
-    private var headerLabel: UILabel!
-    private var segmentedControl: UISegmentedControl!
-    private var ratingLabel: UILabel!
-    private var infoButton: UIButton!
-    private var popoverView: UIView?
+    var headerLabel: UILabel!
+    var segmentedControl: UISegmentedControl!
+    var ratingLabel: UILabel!
+    var infoButton: UIButton!
+    var popoverView: UIView?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -50,6 +50,7 @@ class RatingControlView: UIControl {
         ratingLabel = UILabel()
         ratingLabel.textAlignment = .center
         ratingLabel.font = UIFont.boldSystemFont(ofSize: 16)
+        ratingLabel.text = ""
         addSubview(ratingLabel)
         
         headerLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -99,18 +100,18 @@ class RatingControlView: UIControl {
         return AppStrings.RatingSources.sources[source] ?? source
     }
 
-    @objc private func ratingSourceChanged(_ sender: UISegmentedControl) {
+    @objc func ratingSourceChanged(_ sender: UISegmentedControl) {
         let selectedIndex = sender.selectedSegmentIndex
         let selectedRating = ratings[selectedIndex]
         updateRatingLabel(for: selectedRating.value)
     }
 
-    private func updateRatingLabel(for value: String?) {
+    func updateRatingLabel(for value: String?) {
         ratingLabel.text = value
     }
 
     /// Show a popover with full rating source names
-    @objc private func showRatingSourceInfo() {
+    @objc func showRatingSourceInfo() {
         if popoverView != nil {
             hidePopover()
         } else {

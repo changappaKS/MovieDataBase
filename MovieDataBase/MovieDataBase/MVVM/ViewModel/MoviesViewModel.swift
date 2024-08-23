@@ -37,7 +37,7 @@ class MovieViewModel {
     }
     
     /// Method to process the movies into different sections
-    private func processMovies(movies: [Movie]) {
+    func processMovies(movies: [Movie]) {
         var years = Set<String>()
         var genres = Set<String>()
         var directors = Set<String>()
